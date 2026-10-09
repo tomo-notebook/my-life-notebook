@@ -694,6 +694,149 @@
       border-color: var(--accent);
       color: var(--card);
     }
+    /* ===== Wants（やりたいこと＆欲しいもの） ===== */
+    .wish-switch {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .wish-switch button {
+      background: none;
+      border: 1px solid var(--line);
+      padding: 6px 24px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 14px;
+      color: var(--sub-text);
+    }
+    .wish-switch button:first-child {
+      border-radius: 2px 0 0 2px;
+    }
+    .wish-switch button:last-child {
+      border-radius: 0 2px 2px 0;
+      border-left: none;
+    }
+    .wish-switch button.active {
+      background: var(--text);
+      border-color: var(--text);
+      color: var(--card);
+    }
+    .wish-form .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .wish-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .wish-form input[type="text"] {
+      flex: 1;
+      min-width: 180px;
+    }
+    .wish-form .add-button {
+      padding: 10px 24px;
+      font-size: 14px;
+      background: var(--text);
+      color: var(--card);
+      border: none;
+      border-radius: 2px;
+    }
+    .wish-form .add-button:hover {
+      background: var(--accent);
+    }
+    .wish-form .label {
+      font-size: 13px;
+      color: var(--sub-text);
+    }
+    /* ===== Ideas（アイデアメモ） ===== */
+    .idea-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .idea-form textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .idea-form .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .idea-form .hint {
+      font-size: 12px;
+      color: var(--sub-text);
+    }
+    .idea-form button {
+      padding: 10px 24px;
+      font-size: 14px;
+      background: var(--text);
+      color: var(--card);
+      border: none;
+      border-radius: 2px;
+    }
+    .idea-form button:hover {
+      background: var(--accent);
+    }
+    .idea-search {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+    }
+    .idea-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .idea-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 14px 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .idea-card.pinned {
+      border-color: var(--accent);
+    }
+    .idea-date {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 12px;
+      color: var(--sub-text);
+    }
+    .idea-text {
+      white-space: pre-wrap; /* 改行をそのまま表示する */
+      word-break: break-word;
+      font-size: 15px;
+      line-height: 1.8;
+      flex: 1;
+    }
+    .idea-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .pin-button {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 16px;
+      color: var(--line);
+    }
+    .pin-button:hover,
+    .pin-button.on {
+      color: var(--accent);
+    }
+    .idea-card textarea {
+      min-height: 100px;
+      width: 100%;
+      box-sizing: border-box;
+    }
     /* 「隠す」と決めたものは、必ず隠す */
     [hidden] {
       display: none !important;
@@ -1158,8 +1301,10 @@
     <button data-page="plans">Plans</button>
     <button data-page="diary">Diary</button>
     <button data-page="dreams">Dreams</button>
+    <button data-page="wishes">Wants</button>
     <button data-page="habits">Habits</button>
     <button data-page="media">Books &amp; Films</button>
+    <button data-page="ideas">Ideas</button>
   </nav>
 
   <div id="sync-bar" class="sync-bar">
@@ -1212,6 +1357,59 @@
 
   <p id="empty-message" class="empty-message">まだ夢がありません。上に書いてみましょう！</p>
   <ul id="dream-list"></ul>
+  </section>
+
+  <!-- ===== やりたいこと＆買いたいもののページ ===== -->
+  <section id="page-wishes" hidden>
+  <div class="wish-switch">
+    <button data-wish="todo">Do</button>
+    <button data-wish="buy">Get</button>
+  </div>
+
+  <!-- やりたいこと -->
+  <div id="todo-area">
+    <div class="wish-form">
+      <div class="row">
+        <input id="todo-input" type="text" placeholder="やりたいこと（例：陶芸体験をする）">
+        <button id="todo-add-button" class="add-button">追加</button>
+      </div>
+    </div>
+    <div class="summary"><div id="todo-summary"></div></div>
+    <p id="todo-empty-message" class="empty-message">やりたいことを書いてみましょう！</p>
+    <ul id="todo-list"></ul>
+  </div>
+
+  <!-- 買いたいもの -->
+  <div id="buy-area">
+    <div class="wish-form">
+      <div class="row">
+        <input id="buy-input" type="text" placeholder="欲しいもの（例：ワイヤレスイヤホン）">
+      </div>
+      <textarea id="buy-memo-input" rows="2" placeholder="メモ（なくても大丈夫）"></textarea>
+      <div class="row">
+        <span class="label">欲しい度</span>
+        <div id="buy-rating-input" class="stars"></div>
+        <span class="spacer" style="flex: 1;"></span>
+        <button id="buy-add-button" class="add-button">追加</button>
+      </div>
+    </div>
+    <p id="buy-empty-message" class="empty-message">欲しいものを書いてみましょう！</p>
+    <ul id="buy-list"></ul>
+  </div>
+  </section>
+
+  <!-- ===== アイデアメモのページ ===== -->
+  <section id="page-ideas" hidden>
+  <div class="idea-form">
+    <textarea id="idea-input" placeholder="思いついたことを書きとめよう"></textarea>
+    <div class="row">
+      <span class="hint">⌘ + Enter でも追加できます</span>
+      <button id="idea-add-button">追加</button>
+    </div>
+  </div>
+  <input id="idea-search" class="idea-search" type="text" placeholder="🔍 さがす">
+  <p id="idea-empty-message" class="empty-message"></p>
+  <div id="idea-grid" class="idea-grid"></div>
   </section>
 
   <!-- ===== 習慣トラッカーのページ ===== -->
@@ -1647,7 +1845,7 @@
       const fileName = "手帳バックアップ-" + today.getFullYear() + "-" +
         String(today.getMonth() + 1).padStart(2, "0") + "-" +
         String(today.getDate()).padStart(2, "0") + ".json";
-      const backup = { events: events, goals: goals, dreams: dreams, habits: habits, diary: diary, media: mediaItems };
+      const backup = { events: events, goals: goals, dreams: dreams, todos: todos, wants: wants, ideas: ideas, habits: habits, diary: diary, media: mediaItems };
       const file = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(file);
@@ -1690,7 +1888,10 @@
         const hasEvents = loaded && isList(loaded.events, "text");
         const hasGoals = loaded && loaded.goals && typeof loaded.goals === "object" && !Array.isArray(loaded.goals) &&
           Object.keys(loaded.goals).every(function (key) { return isList(loaded.goals[key], "text"); });
-        if (!hasDreams && !hasMedia && !hasHabits && !hasDiary && !hasEvents && !hasGoals) {
+        const hasTodos = loaded && isList(loaded.todos, "text");
+        const hasWants = loaded && isList(loaded.wants, "text");
+        const hasIdeas = loaded && isList(loaded.ideas, "text");
+        if (!hasDreams && !hasMedia && !hasHabits && !hasDiary && !hasEvents && !hasGoals && !hasTodos && !hasWants && !hasIdeas) {
           alert("このファイルは手帳のバックアップではないようです。");
           importFile.value = "";
           return;
@@ -1699,6 +1900,9 @@
         if (hasEvents) message += "・予定：" + loaded.events.length + "個\n";
         if (hasGoals) message += "・目標\n";
         if (hasDreams) message += "・夢：" + loaded.dreams.length + "個\n";
+        if (hasTodos) message += "・やりたいこと：" + loaded.todos.length + "個\n";
+        if (hasWants) message += "・欲しいもの：" + loaded.wants.length + "個\n";
+        if (hasIdeas) message += "・アイデア：" + loaded.ideas.length + "個\n";
         if (hasHabits) message += "・習慣：" + loaded.habits.length + "個\n";
         if (hasDiary) message += "・日記：" + Object.keys(loaded.diary).length + "日分\n";
         if (hasMedia) message += "・本と映画：" + loaded.media.length + "個\n";
@@ -1720,6 +1924,24 @@
             editingDream = null;
             save();
             show();
+          }
+          if (hasTodos) {
+            todos = loaded.todos;
+            saveTodos();
+          }
+          if (hasWants) {
+            wants = loaded.wants;
+            saveWants();
+          }
+          if (hasTodos || hasWants) {
+            editingWish = null;
+            showWishes();
+          }
+          if (hasIdeas) {
+            ideas = loaded.ideas;
+            editingIdea = null;
+            saveIdeas();
+            showIdeas();
           }
           if (hasHabits) {
             habits = loaded.habits.map(function (habit) {
@@ -3464,11 +3686,465 @@
     showPlans();
 
     // ============================================
+    //  Wants（Do：やりたいこと ／ Get：欲しいもの）
+    // ============================================
+    // やりたいこと：[{ text, done, doneDate, memo }]
+    let todos = JSON.parse(localStorage.getItem("todos") || "[]");
+    // 欲しいもの：[{ text, rating(1〜3), done, doneDate, memo }]
+    let wants = JSON.parse(localStorage.getItem("wants") || "[]");
+    // 「Do」か「Get」か（前回のものを覚えておく）
+    let wishMode = localStorage.getItem("wishMode") === "buy" ? "buy" : "todo";
+    // いま書き直しているもの（書き直していないときは null）
+    let editingWish = null;
+    // 新しく追加するときの「欲しい度」
+    let newWantRating = 2;
+
+    const todoInput = document.getElementById("todo-input");
+    const todoList = document.getElementById("todo-list");
+    const todoSummary = document.getElementById("todo-summary");
+    const todoEmptyMessage = document.getElementById("todo-empty-message");
+    const buyInput = document.getElementById("buy-input");
+    const buyMemoInput = document.getElementById("buy-memo-input");
+    const buyRatingInput = document.getElementById("buy-rating-input");
+    const buyList = document.getElementById("buy-list");
+    const buyEmptyMessage = document.getElementById("buy-empty-message");
+    const wishButtons = document.querySelectorAll(".wish-switch button");
+
+    function saveTodos() {
+      localStorage.setItem("todos", JSON.stringify(todos));
+      notifySaved("todos");
+    }
+    function saveWants() {
+      localStorage.setItem("wants", JSON.stringify(wants));
+      notifySaved("wants");
+    }
+
+    // 「欲しい度」の星（1〜3）
+    function makeWantStars(rating, onChange) {
+      const stars = document.createElement("div");
+      stars.className = "stars";
+      for (let i = 1; i <= 3; i++) {
+        const star = document.createElement("button");
+        star.textContent = "★";
+        star.title = "欲しい度 " + i;
+        if (rating >= i) star.classList.add("on");
+        star.addEventListener("click", function () {
+          onChange(i);
+        });
+        stars.appendChild(star);
+      }
+      return stars;
+    }
+
+    function showNewWantRating() {
+      buyRatingInput.innerHTML = "";
+      buyRatingInput.appendChild(makeWantStars(newWantRating, function (value) {
+        newWantRating = value;
+        showNewWantRating();
+      }));
+    }
+
+    // 「2026-10-03」を「2026/10/3」にする
+    function slashDate(key) {
+      const parts = key.split("-");
+      return parts[0] + "/" + Number(parts[1]) + "/" + Number(parts[2]);
+    }
+
+    // ページ全体を表示する
+    function showWishes() {
+      wishButtons.forEach(function (button) {
+        button.classList.toggle("active", button.dataset.wish === wishMode);
+      });
+      document.getElementById("todo-area").hidden = wishMode !== "todo";
+      document.getElementById("buy-area").hidden = wishMode !== "buy";
+      showTodos();
+      showWants();
+    }
+
+    // チェックボックス・編集・削除の、共通の部品を作る
+    function makeWishCheckbox(item, list, saveFunction) {
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = item.done;
+      checkbox.addEventListener("change", function () {
+        item.done = checkbox.checked;
+        item.doneDate = item.done ? dateKey(new Date()) : "";
+        saveFunction();
+        showWishes();
+      });
+      return checkbox;
+    }
+    function makeWishButtons(item, list, saveFunction, li) {
+      const editButton = document.createElement("button");
+      editButton.textContent = "編集";
+      editButton.className = "edit-button";
+      editButton.addEventListener("click", function () {
+        editingWish = item;
+        showWishes();
+      });
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "削除";
+      deleteButton.className = "delete-button";
+      deleteButton.addEventListener("click", function () {
+        list.splice(list.indexOf(item), 1);
+        saveFunction();
+        showWishes();
+      });
+      li.appendChild(editButton);
+      li.appendChild(deleteButton);
+    }
+    function addMemo(item, li) {
+      if (item.memo) {
+        const memo = document.createElement("div");
+        memo.className = "memo";
+        memo.textContent = item.memo;
+        li.appendChild(memo);
+      }
+    }
+    function addDoneDate(item, word, li) {
+      if (item.done && item.doneDate) {
+        const date = document.createElement("small");
+        date.className = "dream-date";
+        date.textContent = slashDate(item.doneDate) + " に" + word;
+        li.appendChild(date);
+      }
+    }
+
+    // まだのものを上、済んだものを下に並べる
+    function undoneFirst(list) {
+      return list.filter(function (item) { return !item.done; })
+        .concat(list.filter(function (item) { return item.done; }));
+    }
+
+    // ---- やりたいこと ----
+    function showTodos() {
+      todoList.innerHTML = "";
+      todoEmptyMessage.hidden = todos.length > 0;
+      const doneCount = todos.filter(function (item) { return item.done; }).length;
+      todoSummary.textContent = todos.length === 0 ? "" :
+        todos.length + "個のうち、" + doneCount + "個やりました。";
+
+      undoneFirst(todos).forEach(function (item) {
+        const li = document.createElement("li");
+        if (item === editingWish) {
+          li.appendChild(makeWishEditForm(item, "todo"));
+          todoList.appendChild(li);
+          return;
+        }
+        if (item.done) li.classList.add("done");
+        const text = document.createElement("span");
+        text.textContent = item.text;
+        li.appendChild(makeWishCheckbox(item, todos, saveTodos));
+        li.appendChild(text);
+        addDoneDate(item, "やった", li);
+        makeWishButtons(item, todos, saveTodos, li);
+        addMemo(item, li);
+        todoList.appendChild(li);
+      });
+    }
+
+    function addTodo() {
+      const text = todoInput.value.trim();
+      if (text === "") return;
+      todos.push({ text: text, done: false, doneDate: "", memo: "" });
+      todoInput.value = "";
+      saveTodos();
+      showWishes();
+    }
+
+    // ---- 欲しいもの ----
+    function showWants() {
+      buyList.innerHTML = "";
+      buyEmptyMessage.hidden = wants.length > 0;
+
+      // まだ買っていないものは「欲しい度」が高い順
+      const undone = wants.filter(function (item) { return !item.done; })
+        .sort(function (a, b) { return (b.rating || 0) - (a.rating || 0); });
+      const done = wants.filter(function (item) { return item.done; });
+
+      undone.concat(done).forEach(function (item) {
+        const li = document.createElement("li");
+        if (item === editingWish) {
+          li.appendChild(makeWishEditForm(item, "buy"));
+          buyList.appendChild(li);
+          return;
+        }
+        if (item.done) li.classList.add("done");
+
+        const stars = makeWantStars(item.rating || 0, function (value) {
+          item.rating = value;
+          saveWants();
+          showWishes();
+        });
+        const text = document.createElement("span");
+        text.textContent = item.text;
+
+        li.appendChild(makeWishCheckbox(item, wants, saveWants));
+        li.appendChild(stars);
+        li.appendChild(text);
+        addDoneDate(item, "買った", li);
+        makeWishButtons(item, wants, saveWants, li);
+        addMemo(item, li);
+        buyList.appendChild(li);
+      });
+    }
+
+    function addWant() {
+      const text = buyInput.value.trim();
+      if (text === "") {
+        buyInput.focus();
+        return;
+      }
+      wants.push({
+        text: text,
+        rating: newWantRating,
+        done: false,
+        doneDate: "",
+        memo: buyMemoInput.value.trim()
+      });
+      buyInput.value = "";
+      buyMemoInput.value = "";
+      newWantRating = 2;
+      showNewWantRating();
+      saveWants();
+      showWishes();
+    }
+
+    // ---- 書き直し（やりたいこと・欲しいもの 共通）----
+    function makeWishEditForm(item, mode) {
+      const form = document.createElement("div");
+      form.className = "edit-form";
+
+      const textInput = document.createElement("input");
+      textInput.type = "text";
+      textInput.value = item.text;
+      form.appendChild(textInput);
+
+      const memoInput = document.createElement("textarea");
+      memoInput.rows = 2;
+      memoInput.placeholder = "メモ";
+      memoInput.value = item.memo || "";
+      form.appendChild(memoInput);
+
+      const buttons = document.createElement("div");
+      buttons.className = "row";
+      const saveButton = document.createElement("button");
+      saveButton.textContent = "保存";
+      saveButton.className = "save-button";
+      saveButton.addEventListener("click", function () {
+        const newText = textInput.value.trim();
+        if (newText === "") return;
+        item.text = newText;
+        item.memo = memoInput.value.trim();
+        editingWish = null;
+        if (mode === "buy") saveWants(); else saveTodos();
+        showWishes();
+      });
+      const cancelButton = document.createElement("button");
+      cancelButton.textContent = "やめる";
+      cancelButton.className = "cancel-button";
+      cancelButton.addEventListener("click", function () {
+        editingWish = null;
+        showWishes();
+      });
+      buttons.appendChild(saveButton);
+      buttons.appendChild(cancelButton);
+      form.appendChild(buttons);
+      return form;
+    }
+
+    wishButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        wishMode = button.dataset.wish;
+        localStorage.setItem("wishMode", wishMode);
+        editingWish = null;
+        showWishes();
+      });
+    });
+    document.getElementById("todo-add-button").addEventListener("click", addTodo);
+    todoInput.addEventListener("keydown", function (event) {
+      if (isEnterToAdd(event)) addTodo();
+    });
+    document.getElementById("buy-add-button").addEventListener("click", addWant);
+    buyInput.addEventListener("keydown", function (event) {
+      if (isEnterToAdd(event)) addWant();
+    });
+
+    showNewWantRating();
+    showWishes();
+
+    // ============================================
+    //  Ideas（アイデアメモ）
+    // ============================================
+    // アイデア：[{ text, date: "2026-10-09", pinned: true/false, added: 時刻 }]
+    let ideas = JSON.parse(localStorage.getItem("ideas") || "[]");
+    // いま書き直しているアイデア（書き直していないときは null）
+    let editingIdea = null;
+
+    const ideaInput = document.getElementById("idea-input");
+    const ideaSearch = document.getElementById("idea-search");
+    const ideaGrid = document.getElementById("idea-grid");
+    const ideaEmptyMessage = document.getElementById("idea-empty-message");
+
+    function saveIdeas() {
+      localStorage.setItem("ideas", JSON.stringify(ideas));
+      notifySaved("ideas");
+    }
+
+    // 表示するアイデア（さがす欄の言葉をふくむもの。お気に入りが上、あとは新しい順）
+    function ideasToShow() {
+      const word = ideaSearch.value.trim().toLowerCase();
+      return ideas
+        .filter(function (idea) {
+          return word === "" || idea.text.toLowerCase().indexOf(word) !== -1;
+        })
+        .sort(function (a, b) {
+          if (Boolean(a.pinned) !== Boolean(b.pinned)) {
+            return a.pinned ? -1 : 1;
+          }
+          return (b.added || 0) - (a.added || 0);
+        });
+    }
+
+    function showIdeas() {
+      ideaGrid.innerHTML = "";
+      const visible = ideasToShow();
+      if (ideas.length === 0) {
+        ideaEmptyMessage.textContent = "思いついたことを、なんでも書きとめておきましょう！";
+      } else {
+        ideaEmptyMessage.textContent = "「" + ideaSearch.value.trim() + "」をふくむアイデアはありません。";
+      }
+      ideaEmptyMessage.hidden = visible.length > 0;
+
+      visible.forEach(function (idea) {
+        const card = document.createElement("div");
+        card.className = "idea-card";
+        if (idea.pinned) card.classList.add("pinned");
+
+        const date = document.createElement("div");
+        date.className = "idea-date";
+        date.textContent = slashDate(idea.date);
+        card.appendChild(date);
+
+        // 書き直し中
+        if (idea === editingIdea) {
+          const textEdit = document.createElement("textarea");
+          textEdit.value = idea.text;
+          const buttons = document.createElement("div");
+          buttons.className = "idea-actions";
+          const saveButton = document.createElement("button");
+          saveButton.textContent = "保存";
+          saveButton.className = "save-button";
+          saveButton.style.padding = "6px 16px";
+          saveButton.addEventListener("click", function () {
+            const newText = textEdit.value.trim();
+            if (newText === "") return;
+            // ほかの端末から新しい内容が届いていたら、同じアイデアを見つけて直す
+            const target = ideas.indexOf(idea) !== -1 ? idea :
+              ideas.find(function (other) { return other.added === idea.added; });
+            if (target) {
+              target.text = newText;
+            }
+            editingIdea = null;
+            saveIdeas();
+            showIdeas();
+          });
+          const cancelButton = document.createElement("button");
+          cancelButton.textContent = "やめる";
+          cancelButton.className = "cancel-button";
+          cancelButton.style.padding = "6px 16px";
+          cancelButton.addEventListener("click", function () {
+            editingIdea = null;
+            showIdeas();
+          });
+          buttons.appendChild(saveButton);
+          buttons.appendChild(cancelButton);
+          card.appendChild(textEdit);
+          card.appendChild(buttons);
+          ideaGrid.appendChild(card);
+          setTimeout(function () { textEdit.focus(); }, 0);
+          return;
+        }
+
+        const text = document.createElement("div");
+        text.className = "idea-text";
+        text.textContent = idea.text;
+        card.appendChild(text);
+
+        const actions = document.createElement("div");
+        actions.className = "idea-actions";
+
+        // お気に入り（押すと上に固定）
+        const pinButton = document.createElement("button");
+        pinButton.className = "pin-button";
+        pinButton.textContent = idea.pinned ? "★" : "☆";
+        pinButton.title = idea.pinned ? "お気に入りをやめる" : "お気に入りにする（上に固定）";
+        if (idea.pinned) pinButton.classList.add("on");
+        pinButton.addEventListener("click", function () {
+          idea.pinned = !idea.pinned;
+          saveIdeas();
+          showIdeas();
+        });
+
+        const editButton = document.createElement("button");
+        editButton.textContent = "編集";
+        editButton.className = "edit-button";
+        editButton.addEventListener("click", function () {
+          editingIdea = idea;
+          showIdeas();
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "削除";
+        deleteButton.className = "delete-button";
+        deleteButton.addEventListener("click", function () {
+          if (!confirm("このアイデアを削除しますか？")) return;
+          ideas.splice(ideas.indexOf(idea), 1);
+          saveIdeas();
+          showIdeas();
+        });
+
+        actions.appendChild(pinButton);
+        actions.appendChild(editButton);
+        actions.appendChild(deleteButton);
+        card.appendChild(actions);
+        ideaGrid.appendChild(card);
+      });
+    }
+
+    function addIdea() {
+      const text = ideaInput.value.trim();
+      if (text === "") {
+        ideaInput.focus();
+        return;
+      }
+      ideas.push({ text: text, date: dateKey(new Date()), pinned: false, added: Date.now() });
+      ideaInput.value = "";
+      ideaSearch.value = ""; // 追加したものが見えるように、さがす欄を空にする
+      saveIdeas();
+      showIdeas();
+    }
+
+    document.getElementById("idea-add-button").addEventListener("click", addIdea);
+    // ⌘ + Enter（Windows では Ctrl + Enter）で追加。ふつうの Enter は改行
+    ideaInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && !event.isComposing) {
+        event.preventDefault();
+        addIdea();
+      }
+    });
+    ideaSearch.addEventListener("input", showIdeas);
+
+    showIdeas();
+
+    // ============================================
     //  ページの切りかえ
     // ============================================
     const PAGES = {
       plans: { title: "Plans", section: document.getElementById("page-plans") },
       dreams: { title: "Dream List", section: document.getElementById("page-dreams") },
+      wishes: { title: "Wants", section: document.getElementById("page-wishes") },
+      ideas: { title: "Ideas", section: document.getElementById("page-ideas") },
       habits: { title: "Habits", section: document.getElementById("page-habits") },
       diary: { title: "Diary", section: document.getElementById("page-diary") },
       media: { title: "Books & Films", section: document.getElementById("page-media") }
@@ -3526,7 +4202,7 @@
     };
 
     // 同期する記録の名前
-    const SYNC_KEYS = ["events", "goals", "diary", "dreams", "habits", "media"];
+    const SYNC_KEYS = ["events", "goals", "diary", "dreams", "todos", "wants", "ideas", "habits", "media"];
 
     const syncStatus = document.getElementById("sync-status");
     const loginButton = document.getElementById("login-button");
@@ -3706,6 +4382,18 @@
       } else if (key === "goals") {
         goals = value;
         showGoals();
+      } else if (key === "todos") {
+        todos = value;
+        editingWish = null;
+        showWishes();
+      } else if (key === "wants") {
+        wants = value;
+        editingWish = null;
+        showWishes();
+      } else if (key === "ideas") {
+        ideas = value;
+        // 書き直し中のアイデアは、そのまま書き続けられるようにする
+        if (!editingIdea) showIdeas();
       }
     }
 
