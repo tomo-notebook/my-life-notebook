@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dream List</title>
+  <style>
+    /* 色の設定（ここを変えると、アプリ全体の色が変わります） */
+    :root {
+      --background: #f4f1ec;  /* 背景 */
+      --card: #fffdf9;        /* 夢のカード */
+      --text: #2b2926;        /* 文字 */
+      --sub-text: #8c857b;    /* 薄い文字 */
+      --line: #e2dcd2;        /* 線 */
+      --accent: #a8875a;      /* アクセント（金色） */
+      --danger: #a9574d;      /* 削除・期限切れ */
+    }
+    body {
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+      font-weight: 300;
+      background: var(--background);
+      color: var(--text);
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 48px 20px;
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+    }
+    /* タイトル */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .subtitle {
+      font-family: Georgia, "Times New Roman", serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      margin: 0;
+    }
+    h1 {
+      font-family: Didot, "Bodoni 72", Georgia, serif;
+      font-weight: 400;
+      font-size: 34px;
+      letter-spacing: 0.12em;
+      margin: 8px 0 0;
+    }
+    header::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+      margin: 20px auto 0;
+    }
+    /* ページ切りかえボタン */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin: -16px 0 36px;
+    }
+    .tabs button {
+      background: none;
+      border: none;
+      border-bottom: 1px solid transparent;
+      padding: 4px 2px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 15px;
+      color: var(--sub-text);
+    }
+    .tabs button:hover {
+      color: var(--text);
+    }
+    .tabs button.active {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+    /* 星の評価 */
+    .stars button {
+      background: none;
+      border: none;
+      padding: 0 1px;
+      font-size: 15px;
+      color: var(--line);
+      letter-spacing: 0;
+    }
+    .stars button.on {
+      color: var(--accent);
+    }
+    /* 入力欄・選ぶ欄 共通 */
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+      font-family: inherit;
+      font-weight: 300;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 10px 12px;
+      outline: none;
+    }
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+    }
+    input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    button {
+      font-family: inherit;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+    }
+    /* 入力欄と追加ボタン */
+    .input-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .input-area input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+    }
+    .input-area button {
+      padding: 10px 24px;
+      font-size: 14px;
+      background: var(--text);
+      color: var(--card);
+      border: none;
+      border-radius: 2px;
+    }
+    .input-area button:hover {
+      background: var(--accent);
+    }
+    /* かなった夢の数 */
+    .summary {
+      text-align: center;
+      font-size: 14px;
+      color: var(--sub-text);
+      margin-bottom: 28px;
+    }
+    .progress {
+      height: 2px;
+      background: var(--line);
+      margin: 10px auto 0;
+      max-width: 320px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.4s;
+    }
+    /* ジャンルの絞り込みと並び順 */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--sub-text);
+      align-items: center;
+    }
+    .controls select {
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+    /* 夢の一覧 */
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border-top: 1px solid var(--line);
+    }
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 4px;
+      border-bottom: 1px solid var(--line);
+    }
+    li span {
+      flex: 1;
+      font-size: 16px;
+    }
+    /* ジャンルの札 */
+    .genre-tag {
+      font-size: 11px;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0 8px;
+      border-radius: 2px;
+      white-space: nowrap;
+      letter-spacing: 0.1em;
+    }
+    /* 目標の日付 */
+    .dream-date {
+      font-size: 12px;
+      color: var(--sub-text);
+      white-space: nowrap;
+    }
+    .dream-date.over {
+      color: var(--danger);
+    }
+    /* かなった夢は線を引いて薄くする */
+    li.done span {
+      text-decoration: line-through;
+      text-decoration-color: var(--accent);
+      color: var(--sub-text);
+    }
+    li.done .genre-tag {
+      opacity: 0.5;
+    }
+    .delete-button,
+    .edit-button {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 12px;
+      color: var(--sub-text);
+    }
+    .edit-button:hover {
+      color: var(--accent);
+    }
+    .delete-button:hover {
+      color: var(--danger);
+    }
+    /* メモ（夢の下に表示する） */
+    .memo {
+      flex-basis: 100%;
+      font-size: 13px;
+      color: var(--sub-text);
+      padding-left: 12px;
+      margin-left: 28px;
+      border-left: 1px solid var(--accent);
+      white-space: pre-wrap; /* 改行をそのまま表示する */
+    }
+    /* 書き直し用の入力欄 */
+    .edit-form {
+      flex-basis: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .edit-form .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .edit-form button {
+      padding: 8px 20px;
+      font-size: 13px;
+      border-radius: 2px;
+    }
+    .save-button {
+      background: var(--text);
+      color: var(--card);
+      border: 1px solid var(--text);
+    }
+    .cancel-button {
+      background: none;
+      color: var(--sub-text);
+      border: 1px solid var(--line);
+    }
+    .empty-message {
+      text-align: center;
+      color: var(--sub-text);
+      font-size: 14px;
+      padding: 32px 0;
+    }
+    /* バックアップ */
+    .backup {
+      margin-top: 56px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--sub-text);
+    }
+    .backup p {
+      margin: 0 0 8px;
+      letter-spacing: 0.15em;
+    }
+    .backup button {
+      padding: 6px 16px;
+      font-size: 12px;
+      margin: 4px;
+      background: none;
+      color: var(--sub-text);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+    }
+    .backup button:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="subtitle">Notebook</p>
+    <h1 id="page-title">Dream List</h1>
+  </header>
+
+  <nav class="tabs">
+    <button data-page="dreams">Dreams</button>
+    <button data-page="media">Books &amp; Films</button>
+  </nav>
+
+  <!-- ===== 夢リストのページ ===== -->
+  <section id="page-dreams">
+
+  <div class="input-area">
+    <input id="dream-input" type="text" placeholder="夢を書いてください（例：富士山に登る）">
+    <select id="genre-input" title="ジャンル">
+      <option value="旅行">旅行</option>
+      <option value="仕事">仕事</option>
+      <option value="趣味">趣味</option>
+      <option value="学び">学び</option>
+      <option value="健康">健康</option>
+      <option value="その他" selected>その他</option>
+    </select>
+    <input id="date-input" type="date" title="目標の日付（なくても大丈夫）">
+    <button id="add-button">追加</button>
+  </div>
+
+  <div class="summary">
+    <div id="summary-text"></div>
+    <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
+  </div>
+
+  <div class="controls">
+    <label>ジャンル：
+      <select id="genre-filter">
+        <option value="すべて">すべて</option>
+        <option value="旅行">旅行</option>
+        <option value="仕事">仕事</option>
+        <option value="趣味">趣味</option>
+        <option value="学び">学び</option>
+        <option value="健康">健康</option>
+        <option value="その他">その他</option>
+      </select>
+    </label>
+    <label>並び順：
+      <select id="sort-order">
+        <option value="added">追加した順</option>
+        <option value="date">日付が近い順</option>
+      </select>
+    </label>
+  </div>
+
+  <p id="empty-message" class="empty-message">まだ夢がありません。上に書いてみましょう！</p>
+  <ul id="dream-list"></ul>
+  </section>
+
+  <!-- ===== 本・映画リストのページ ===== -->
+  <section id="page-media" hidden>
+  <div class="input-area">
+    <input id="media-input" type="text" placeholder="タイトルを書いてください（例：星の王子さま）">
+    <select id="media-type-input" title="種類">
+      <option value="本">本</option>
+      <option value="映画">映画</option>
+    </select>
+    <button id="media-add-button">追加</button>
+  </div>
+
+  <div class="summary">
+    <div id="media-summary-text"></div>
+  </div>
+
+  <div class="controls">
+    <label>種類：
+      <select id="media-type-filter">
+        <option value="すべて">すべて</option>
+        <option value="本">本</option>
+        <option value="映画">映画</option>
+      </select>
+    </label>
+    <label>表示：
+      <select id="media-status-filter">
+        <option value="すべて">すべて</option>
+        <option value="まだ">まだのもの</option>
+        <option value="済み">読んだ・観たもの</option>
+      </select>
+    </label>
+  </div>
+
+  <p id="media-empty-message" class="empty-message"></p>
+  <ul id="media-list"></ul>
+  </section>
+
+  <div class="backup">
+    <p>手帳のバックアップ</p>
+    <button id="export-button">ファイルに書き出す</button>
+    <button id="import-button">ファイルから読み込む</button>
+    <input id="import-file" type="file" accept=".json" hidden>
+  </div>
+
+  <script>
+    // ブラウザに保存するときの名前
+    const STORAGE_KEY = "dreams";
+
+    // 「追加するためのEnter」かどうかを調べる
+    // （日本語の変換を確定するためのEnterでは追加しない。
+    //   Safari では変換確定のEnterが keyCode 229 になるので、それも見分ける）
+    function isEnterToAdd(event) {
+      return event.key === "Enter" && !event.isComposing && event.keyCode !== 229;
+    }
+
+    // 保存されている夢を読み込む（なければ空のリスト）
+    let dreams = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+    const input = document.getElementById("dream-input");
+    const dateInput = document.getElementById("date-input");
+    const genreInput = document.getElementById("genre-input");
+    const addButton = document.getElementById("add-button");
+    const list = document.getElementById("dream-list");
+    const emptyMessage = document.getElementById("empty-message");
+    const summaryText = document.getElementById("summary-text");
+    const progressBar = document.getElementById("progress-bar");
+    const genreFilter = document.getElementById("genre-filter");
+    const sortOrder = document.getElementById("sort-order");
+
+    // 選べるジャンルの一覧
+    const GENRES = ["旅行", "仕事", "趣味", "学び", "健康", "その他"];
+
+    // いま書き直している夢（書き直していないときは null）
+    let editingDream = null;
+
+    // ジャンルがない夢（前に追加したもの）は「その他」として扱う
+    function genreOf(dream) {
+      return dream.genre || "その他";
+    }
+
+    // 「5個の夢のうち、2個かなった！」を表示する
+    function showSummary() {
+      const total = dreams.length;
+      const doneCount = dreams.filter(function (dream) { return dream.done; }).length;
+      if (total === 0) {
+        summaryText.textContent = "夢を追加すると、ここに数が表示されます";
+        progressBar.style.width = "0%";
+        return;
+      }
+      summaryText.textContent = total + "個の夢のうち、" + doneCount + "個がかないました。" +
+        (doneCount === total ? " すべての夢がかないました。" : "");
+      progressBar.style.width = (doneCount / total * 100) + "%";
+    }
+
+    // 表示する夢を選んで、並べ替える
+    function dreamsToShow() {
+      let result = dreams.filter(function (dream) {
+        return genreFilter.value === "すべて" || genreOf(dream) === genreFilter.value;
+      });
+      if (sortOrder.value === "date") {
+        // 日付が近い順に並べる（日付がない夢はいちばん下）
+        result = result.slice().sort(function (a, b) {
+          if (!a.date && !b.date) return 0;
+          if (!a.date) return 1;
+          if (!b.date) return -1;
+          return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
+        });
+      }
+      return result;
+    }
+
+    // 夢のリストをブラウザに保存する
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dreams));
+    }
+
+    // 画面に夢のリストを表示する
+    function show() {
+      list.innerHTML = "";
+      showSummary();
+
+      const visible = dreamsToShow();
+      if (dreams.length === 0) {
+        emptyMessage.textContent = "まだ夢がありません。上に書いてみましょう！";
+      } else {
+        emptyMessage.textContent = "このジャンルの夢はまだありません。";
+      }
+      emptyMessage.hidden = visible.length > 0;
+
+      visible.forEach(function (dream) {
+        // 書き直し中の夢は、入力欄を表示する
+        if (dream === editingDream) {
+          list.appendChild(makeEditForm(dream));
+          return;
+        }
+
+        const li = document.createElement("li");
+        if (dream.done) {
+          li.classList.add("done");
+        }
+
+        // かなったらチェックを入れる
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = dream.done;
+        checkbox.addEventListener("change", function () {
+          dream.done = checkbox.checked;
+          save();
+          show();
+        });
+
+        // 夢の文章
+        const text = document.createElement("span");
+        text.textContent = dream.text;
+
+        // ジャンルの札
+        const genreTag = document.createElement("small");
+        genreTag.className = "genre-tag";
+        genreTag.textContent = genreOf(dream);
+
+        // 目標の日付（書いてある場合だけ表示する）
+        const dateText = document.createElement("small");
+        dateText.className = "dream-date";
+        if (dream.date) {
+          dateText.textContent = makeDateText(dream.date, dream.done);
+          if (!dream.done && daysLeft(dream.date) < 0) {
+            dateText.classList.add("over"); // 日付を過ぎていたら赤くする
+          }
+        }
+
+        // 編集ボタン
+        const editButton = document.createElement("button");
+        editButton.textContent = "編集";
+        editButton.className = "edit-button";
+        editButton.addEventListener("click", function () {
+          editingDream = dream;
+          show();
+        });
+
+        // 削除ボタン
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "削除";
+        deleteButton.className = "delete-button";
+        deleteButton.addEventListener("click", function () {
+          dreams.splice(dreams.indexOf(dream), 1);
+          save();
+          show();
+        });
+
+        li.appendChild(checkbox);
+        li.appendChild(genreTag);
+        li.appendChild(text);
+        li.appendChild(dateText);
+        li.appendChild(editButton);
+        li.appendChild(deleteButton);
+
+        // メモ（書いてある場合だけ表示する）
+        if (dream.memo) {
+          const memo = document.createElement("div");
+          memo.className = "memo";
+          memo.textContent = dream.memo;
+          li.appendChild(memo);
+        }
+
+        list.appendChild(li);
+      });
+    }
+
+    // 夢を書き直すための入力欄を作る
+    function makeEditForm(dream) {
+      const li = document.createElement("li");
+      const form = document.createElement("div");
+      form.className = "edit-form";
+
+      // 夢の文章
+      const textInput = document.createElement("input");
+      textInput.type = "text";
+      textInput.value = dream.text;
+
+      // ジャンルと日付（横に並べる）
+      const row = document.createElement("div");
+      row.className = "row";
+      const genreSelect = document.createElement("select");
+      GENRES.forEach(function (genre) {
+        const option = document.createElement("option");
+        option.value = genre;
+        option.textContent = genre;
+        genreSelect.appendChild(option);
+      });
+      genreSelect.value = genreOf(dream);
+      const dateEdit = document.createElement("input");
+      dateEdit.type = "date";
+      dateEdit.value = dream.date || "";
+      row.appendChild(genreSelect);
+      row.appendChild(dateEdit);
+
+      // メモ（何行でも書ける）
+      const memoInput = document.createElement("textarea");
+      memoInput.rows = 3;
+      memoInput.placeholder = "メモ（思いや、かなえるための計画など）";
+      memoInput.value = dream.memo || "";
+
+      // 保存ボタンとやめるボタン
+      const buttons = document.createElement("div");
+      buttons.className = "row";
+      const saveButton = document.createElement("button");
+      saveButton.textContent = "保存";
+      saveButton.className = "save-button";
+      saveButton.addEventListener("click", function () {
+        const newText = textInput.value.trim();
+        if (newText === "") {
+          return; // 夢の文章が空なら保存しない
+        }
+        dream.text = newText;
+        dream.genre = genreSelect.value;
+        dream.date = dateEdit.value;
+        dream.memo = memoInput.value.trim();
+        editingDream = null;
+        save();
+        show();
+      });
+      const cancelButton = document.createElement("button");
+      cancelButton.textContent = "やめる";
+      cancelButton.className = "cancel-button";
+      cancelButton.addEventListener("click", function () {
+        editingDream = null;
+        show();
+      });
+      buttons.appendChild(saveButton);
+      buttons.appendChild(cancelButton);
+
+      form.appendChild(textInput);
+      form.appendChild(row);
+      form.appendChild(memoInput);
+      form.appendChild(buttons);
+      li.appendChild(form);
+      return li;
+    }
+
+    // 今日から目標の日付まで、あと何日あるかを計算する
+    function daysLeft(dateString) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const target = new Date(dateString + "T00:00:00");
+      return Math.round((target - today) / (1000 * 60 * 60 * 24));
+    }
+
+    // 「目標：2027年3月1日（あと143日）」のような文章を作る
+    function makeDateText(dateString, done) {
+      const parts = dateString.split("-");
+      let result = "目標：" + parts[0] + "年" + Number(parts[1]) + "月" + Number(parts[2]) + "日";
+      if (!done) {
+        const days = daysLeft(dateString);
+        if (days > 0) {
+          result += "（あと" + days + "日）";
+        } else if (days === 0) {
+          result += "（今日！）";
+        } else {
+          result += "（" + (-days) + "日過ぎています）";
+        }
+      }
+      return result;
+    }
+
+    // 夢を追加する
+    function addDream() {
+      const text = input.value.trim();
+      if (text === "") {
+        return; // 何も書いていなければ何もしない
+      }
+      dreams.push({ text: text, genre: genreInput.value, date: dateInput.value, done: false });
+      input.value = "";
+      dateInput.value = "";
+      save();
+      show();
+    }
+
+    addButton.addEventListener("click", addDream);
+
+    // ジャンルや並び順を変えたら、表示しなおす
+    genreFilter.addEventListener("change", show);
+    sortOrder.addEventListener("change", show);
+
+    // Enterキーでも追加できるようにする
+    input.addEventListener("keydown", function (event) {
+      if (isEnterToAdd(event)) {
+        addDream();
+      }
+    });
+
+    // 夢をファイルに書き出す（「ダウンロード」フォルダに保存されます）
+    document.getElementById("export-button").addEventListener("click", function () {
+      const today = new Date();
+      const fileName = "手帳バックアップ-" + today.getFullYear() + "-" +
+        String(today.getMonth() + 1).padStart(2, "0") + "-" +
+        String(today.getDate()).padStart(2, "0") + ".json";
+      const backup = { dreams: dreams, media: mediaItems };
+      const file = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(file);
+      link.download = fileName;
+      link.click();
+      setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+    });
+
+    // ファイルから夢を読み込む
+    const importFile = document.getElementById("import-file");
+    document.getElementById("import-button").addEventListener("click", function () {
+      importFile.click(); // ファイルを選ぶ画面を開く
+    });
+    importFile.addEventListener("change", function () {
+      const file = importFile.files[0];
+      if (!file) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function () {
+        let loaded;
+        try {
+          loaded = JSON.parse(reader.result);
+        } catch (error) {
+          loaded = null;
+        }
+        // 前の形のファイル（夢だけ）にも対応する
+        if (Array.isArray(loaded)) {
+          loaded = { dreams: loaded };
+        }
+        // 手帳のバックアップファイルかどうか確かめる
+        function isList(items, key) {
+          return Array.isArray(items) && items.every(function (d) { return d && typeof d[key] === "string"; });
+        }
+        const hasDreams = loaded && isList(loaded.dreams, "text");
+        const hasMedia = loaded && isList(loaded.media, "title");
+        if (!hasDreams && !hasMedia) {
+          alert("このファイルは手帳のバックアップではないようです。");
+          importFile.value = "";
+          return;
+        }
+        let message = "今の内容が、ファイルの内容に置きかわります。\n";
+        if (hasDreams) message += "・夢：" + loaded.dreams.length + "個\n";
+        if (hasMedia) message += "・本と映画：" + loaded.media.length + "個\n";
+        if (confirm(message + "よろしいですか？")) {
+          if (hasDreams) {
+            dreams = loaded.dreams;
+            editingDream = null;
+            save();
+            show();
+          }
+          if (hasMedia) {
+            mediaItems = loaded.media;
+            editingMedia = null;
+            saveMedia();
+            showMedia();
+          }
+          alert("読み込みました！");
+        }
+        importFile.value = ""; // 同じファイルをもう一度選べるようにする
+      };
+      reader.readAsText(file);
+    });
+
+    // 最初に一度表示する
+    show();
+  </script>
+
+  <script>
+    // ============================================
+    //  本・映画リスト
+    // ============================================
+    const MEDIA_STORAGE_KEY = "media";
+    let mediaItems = JSON.parse(localStorage.getItem(MEDIA_STORAGE_KEY) || "[]");
+
+    // いま書き直しているもの（書き直していないときは null）
+    let editingMedia = null;
+
+    const mediaInput = document.getElementById("media-input");
+    const mediaTypeInput = document.getElementById("media-type-input");
+    const mediaList = document.getElementById("media-list");
+    const mediaEmptyMessage = document.getElementById("media-empty-message");
+    const mediaSummaryText = document.getElementById("media-summary-text");
+    const mediaTypeFilter = document.getElementById("media-type-filter");
+    const mediaStatusFilter = document.getElementById("media-status-filter");
+
+    function saveMedia() {
+      localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(mediaItems));
+    }
+
+    // 本なら「読んだ」、映画なら「観た」
+    function doneWord(item) {
+      return item.type === "映画" ? "観た" : "読んだ";
+    }
+
+    // 今日の日付を「2026-10-09」の形で作る
+    function todayString() {
+      const today = new Date();
+      return today.getFullYear() + "-" +
+        String(today.getMonth() + 1).padStart(2, "0") + "-" +
+        String(today.getDate()).padStart(2, "0");
+    }
+
+    // 「2026-10-09」を「2026年10月9日」にする
+    function japaneseDate(dateString) {
+      const parts = dateString.split("-");
+      return parts[0] + "年" + Number(parts[1]) + "月" + Number(parts[2]) + "日";
+    }
+
+    // 「本 5冊のうち2冊を読みました ／ 映画 3本のうち1本を観ました」を表示する
+    function showMediaSummary() {
+      const books = mediaItems.filter(function (item) { return item.type !== "映画"; });
+      const films = mediaItems.filter(function (item) { return item.type === "映画"; });
+      const doneBooks = books.filter(function (item) { return item.done; }).length;
+      const doneFilms = films.filter(function (item) { return item.done; }).length;
+      if (mediaItems.length === 0) {
+        mediaSummaryText.textContent = "読みたい本や観たい映画を追加してみましょう";
+        return;
+      }
+      mediaSummaryText.textContent =
+        "本 " + books.length + "冊のうち" + doneBooks + "冊を読みました　／　" +
+        "映画 " + films.length + "本のうち" + doneFilms + "本を観ました";
+    }
+
+    // 表示するものを選ぶ
+    function mediaToShow() {
+      return mediaItems.filter(function (item) {
+        const typeOk = mediaTypeFilter.value === "すべて" || item.type === mediaTypeFilter.value;
+        const statusOk = mediaStatusFilter.value === "すべて" ||
+          (mediaStatusFilter.value === "済み" ? item.done : !item.done);
+        return typeOk && statusOk;
+      });
+    }
+
+    // 星の評価（1〜5）を作る。押すと評価が変わる
+    function makeStars(item) {
+      const stars = document.createElement("span");
+      stars.className = "stars";
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement("button");
+        star.textContent = "★";
+        star.title = i + "つ星";
+        if (item.rating >= i) {
+          star.classList.add("on");
+        }
+        star.addEventListener("click", function () {
+          // 同じ星をもう一度押すと、評価を消す
+          item.rating = item.rating === i ? 0 : i;
+          saveMedia();
+          showMedia();
+        });
+        stars.appendChild(star);
+      }
+      return stars;
+    }
+
+    // 画面に本・映画のリストを表示する
+    function showMedia() {
+      mediaList.innerHTML = "";
+      showMediaSummary();
+
+      const visible = mediaToShow();
+      if (mediaItems.length === 0) {
+        mediaEmptyMessage.textContent = "まだ何もありません。上に書いてみましょう！";
+      } else {
+        mediaEmptyMessage.textContent = "表示するものがありません。";
+      }
+      mediaEmptyMessage.hidden = visible.length > 0;
+
+      visible.forEach(function (item) {
+        if (item === editingMedia) {
+          mediaList.appendChild(makeMediaEditForm(item));
+          return;
+        }
+
+        const li = document.createElement("li");
+        if (item.done) {
+          li.classList.add("done");
+        }
+
+        // 読んだ・観たらチェックを入れる
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = item.done;
+        checkbox.title = doneWord(item) + "らチェック";
+        checkbox.addEventListener("change", function () {
+          item.done = checkbox.checked;
+          item.doneDate = item.done ? todayString() : "";
+          saveMedia();
+          showMedia();
+        });
+
+        // 種類の札
+        const typeTag = document.createElement("small");
+        typeTag.className = "genre-tag";
+        typeTag.textContent = item.type;
+
+        // タイトル
+        const title = document.createElement("span");
+        title.textContent = item.title;
+
+        li.appendChild(checkbox);
+        li.appendChild(typeTag);
+        li.appendChild(title);
+
+        // 読んだ・観たものには、日付と星を表示する
+        if (item.done) {
+          if (item.doneDate) {
+            const dateText = document.createElement("small");
+            dateText.className = "dream-date";
+            dateText.textContent = japaneseDate(item.doneDate) + "に" + doneWord(item);
+            li.appendChild(dateText);
+          }
+          li.appendChild(makeStars(item));
+        }
+
+        // 編集ボタン
+        const editButton = document.createElement("button");
+        editButton.textContent = "編集";
+        editButton.className = "edit-button";
+        editButton.addEventListener("click", function () {
+          editingMedia = item;
+          showMedia();
+        });
+
+        // 削除ボタン
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "削除";
+        deleteButton.className = "delete-button";
+        deleteButton.addEventListener("click", function () {
+          mediaItems.splice(mediaItems.indexOf(item), 1);
+          saveMedia();
+          showMedia();
+        });
+
+        li.appendChild(editButton);
+        li.appendChild(deleteButton);
+
+        // 感想（書いてある場合だけ表示する）
+        if (item.memo) {
+          const memo = document.createElement("div");
+          memo.className = "memo";
+          memo.textContent = item.memo;
+          li.appendChild(memo);
+        }
+
+        mediaList.appendChild(li);
+      });
+    }
+
+    // 書き直すための入力欄を作る
+    function makeMediaEditForm(item) {
+      const li = document.createElement("li");
+      const form = document.createElement("div");
+      form.className = "edit-form";
+
+      // タイトルと種類
+      const row = document.createElement("div");
+      row.className = "row";
+      const titleInput = document.createElement("input");
+      titleInput.type = "text";
+      titleInput.value = item.title;
+      titleInput.style.flex = "1";
+      const typeSelect = document.createElement("select");
+      ["本", "映画"].forEach(function (type) {
+        const option = document.createElement("option");
+        option.value = type;
+        option.textContent = type;
+        typeSelect.appendChild(option);
+      });
+      typeSelect.value = item.type;
+      row.appendChild(titleInput);
+      row.appendChild(typeSelect);
+
+      // 感想（何行でも書ける）
+      const memoInput = document.createElement("textarea");
+      memoInput.rows = 3;
+      memoInput.placeholder = "感想・メモ（だれにすすめられたか、心に残った言葉など）";
+      memoInput.value = item.memo || "";
+
+      // 保存ボタンとやめるボタン
+      const buttons = document.createElement("div");
+      buttons.className = "row";
+      const saveButton = document.createElement("button");
+      saveButton.textContent = "保存";
+      saveButton.className = "save-button";
+      saveButton.addEventListener("click", function () {
+        const newTitle = titleInput.value.trim();
+        if (newTitle === "") {
+          return; // タイトルが空なら保存しない
+        }
+        item.title = newTitle;
+        item.type = typeSelect.value;
+        item.memo = memoInput.value.trim();
+        editingMedia = null;
+        saveMedia();
+        showMedia();
+      });
+      const cancelButton = document.createElement("button");
+      cancelButton.textContent = "やめる";
+      cancelButton.className = "cancel-button";
+      cancelButton.addEventListener("click", function () {
+        editingMedia = null;
+        showMedia();
+      });
+      buttons.appendChild(saveButton);
+      buttons.appendChild(cancelButton);
+
+      form.appendChild(row);
+      form.appendChild(memoInput);
+      form.appendChild(buttons);
+      li.appendChild(form);
+      return li;
+    }
+
+    // 本・映画を追加する
+    function addMedia() {
+      const title = mediaInput.value.trim();
+      if (title === "") {
+        return;
+      }
+      mediaItems.push({ title: title, type: mediaTypeInput.value, done: false, doneDate: "", rating: 0, memo: "" });
+      mediaInput.value = "";
+      saveMedia();
+      showMedia();
+    }
+
+    document.getElementById("media-add-button").addEventListener("click", addMedia);
+    mediaInput.addEventListener("keydown", function (event) {
+      if (isEnterToAdd(event)) {
+        addMedia();
+      }
+    });
+    mediaTypeFilter.addEventListener("change", showMedia);
+    mediaStatusFilter.addEventListener("change", showMedia);
+
+    showMedia();
+
+    // ============================================
+    //  ページの切りかえ
+    // ============================================
+    const PAGES = {
+      dreams: { title: "Dream List", section: document.getElementById("page-dreams") },
+      media: { title: "Books & Films", section: document.getElementById("page-media") }
+    };
+    const tabButtons = document.querySelectorAll(".tabs button");
+
+    function openPage(name) {
+      if (!PAGES[name]) {
+        name = "dreams";
+      }
+      Object.keys(PAGES).forEach(function (key) {
+        PAGES[key].section.hidden = key !== name;
+      });
+      tabButtons.forEach(function (button) {
+        button.classList.toggle("active", button.dataset.page === name);
+      });
+      document.getElementById("page-title").textContent = PAGES[name].title;
+      document.title = PAGES[name].title;
+      // 次に開いたとき、同じページから始まるように覚えておく
+      localStorage.setItem("lastPage", name);
+    }
+
+    tabButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        openPage(button.dataset.page);
+      });
+    });
+
+    openPage(localStorage.getItem("lastPage"));
+  </script>
+</body>
+</html>
